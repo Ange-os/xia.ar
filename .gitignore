@@ -1,0 +1,221 @@
+# ============================================
+# xIA Backend - .gitignore
+# ============================================
+
+# ============================================
+# SEGURIDAD - CRÍTICO (NUNCA COMMITEAR)
+# ============================================
+
+# Variables de entorno con credenciales sensibles
+.env
+.env.local
+.env.*.local
+*.env
+.envrc
+
+# Archivos con secretos y claves
+secrets.json
+config/secrets.py
+*.key
+*.pem
+*.p12
+*.pfx
+
+# Credenciales de bases de datos
+*.db
+*.sqlite
+*.sqlite3
+
+# ============================================
+# ENTORNO VIRTUAL (muy pesado, se regenera)
+# ============================================
+
+venv/
+env/
+ENV/
+.venv/
+.ENV/
+virtualenv/
+.venv/
+
+# ============================================
+# LOGS (pueden ser muy grandes)
+# ============================================
+
+logs/
+*.log
+*.log.*
+gunicorn_access.log
+gunicorn_error.log
+app_*.log
+
+# ============================================
+# PYTHON - Bytecode y archivos compilados
+# ============================================
+
+# Bytecode compilado
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Distribuciones / empaquetado
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ============================================
+# PROCESOS Y ARCHIVOS DE RUNTIME
+# ============================================
+
+# PID files
+*.pid
+gunicorn.pid
+*.sock
+
+# Archivos de proceso
+*.process
+
+# ============================================
+# SISTEMA OPERATIVO
+# ============================================
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.directory
+.Trash-*
+
+# ============================================
+# EDITORES E IDEs
+# ============================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+.vim/
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# ============================================
+# TESTING Y COVERAGE
+# ============================================
+
+# Coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# ============================================
+# ARCHIVOS TEMPORALES Y BACKUP
+# ============================================
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.backup
+*.old
+*.orig
+*.save
+*.swp
+*.swo
+
+# Archivos de respaldo
+*~
+*.bak
+*.backup
+
+# ============================================
+# ARCHIVOS ESPECÍFICOS DEL PROYECTO
+# ============================================
+
+# get-pip.py (muy grande, se puede descargar cuando se necesite)
+# Descomentar si no quieres subirlo:
+# get-pip.py
+
+# Archivos de instalación temporales
+*.install.log
+*.install.err
+
+# ============================================
+# NOTAS
+# ============================================
+# 
+# IMPORTANTE:
+# - NUNCA commitees archivos .env con credenciales reales
+# - El entorno virtual (venv/) se crea localmente en cada máquina
+# - Los logs se generan en runtime y no deben versionarse
+# - Los archivos __pycache__ se regeneran automáticamente
+#
+

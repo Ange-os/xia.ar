@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>xIA — Consultoría en Sistemas</title>
+  <link rel="icon" type="image/png" href="/assets/images/abmsistemas-favicon.png">
+  <link rel="apple-touch-icon" href="/assets/images/abmsistemas-favicon.png">
+  <style>
+    :root { --bg:#0f1115; --fg:#e6e8ee; --muted:#a3a8b8; --accent:#4f8cff; --success:#10b981; --warning:#f59e0b; }
+    * { box-sizing:border-box; }
+    html, body { block-size:100%; margin:0; }
+    body { background:var(--bg); color:var(--fg); font:16px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif; }
+    .wrap { min-block-size:100%; display:flex; align-items:center; justify-content:center; padding:24px; }
+    .card { text-align:center; max-inline-size:800px; inline-size:100%; padding:32px; border:1px solid rgba(255,255,255,.06); background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01)); border-radius:14px; box-shadow:0 10px 30px rgba(0,0,0,.35); }
+    .logo { font-size:48px; font-weight:700; letter-spacing:.5px; margin:0 0 8px; }
+    .logo .dot { color:var(--accent); }
+    .tag { margin:0 0 16px; color:var(--muted); font-size:18px; }
+    .hr { block-size:1px; background:rgba(255,255,255,.08); margin:24px auto; inline-size:72px; border:none; }
+    .claim { margin:0 0 32px; font-size:20px; font-weight:500; letter-spacing:.2px; }
+    
+    /* Chat Interface */
+    .chat-container { display:none; margin-block-start:24px; }
+    .chat-container.active { display:block; }
+    .chat-window { background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:20px; margin-block-end:16px; max-block-size:400px; overflow-y:auto; }
+    .message { 
+      margin-block-end:16px; 
+      padding:12px 16px; 
+      border-radius:8px; 
+      max-inline-size:75%; 
+      word-wrap:break-word;
+    }
+    .message.user { 
+      background:rgba(79,140,255,.1); 
+      border-inline-start:3px solid var(--accent); 
+      margin-inline-start:auto; 
+      margin-inline-end:0;
+    }
+    .message.ai { 
+      background:rgba(16,185,129,.1); 
+      border-inline-start:3px solid var(--success); 
+      margin-inline-start:0; 
+      margin-inline-end:auto;
+    }
+    .message-header { font-size:12px; color:var(--muted); margin-block-end:4px; }
+    .message-content { line-height:1.4; }
+    
+    /* Input Area */
+    .input-area { display:flex; gap:12px; margin-block-end:16px; }
+    .input-field { flex:1; padding:12px 16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(--fg); font-size:14px; }
+    .input-field:focus { outline:none; border-color:var(--accent); }
+    .input-field::placeholder { color:var(--muted); }
+    .btn { padding:12px 24px; background:var(--accent); color:white; border:none; border-radius:8px; font-size:14px; font-weight:500; cursor:pointer; transition:all 0.2s; }
+    .btn:hover { background:#3b82f6; transform:translateY(-1px); }
+    .btn:disabled { background:var(--muted); cursor:not-allowed; transform:none; }
+    .btn.secondary { background:rgba(255,255,255,.1); }
+    .btn.secondary:hover { background:rgba(255,255,255,.2); }
+    
+    /* Email Form */
+    .email-form { display:none; margin-block-start:24px; padding:20px; background:rgba(255,255,255,.02); border:1px solid rgba(255,255,255,.08); border-radius:12px; }
+    .email-form.active { display:block; }
+    .form-group { margin-block-end:16px; }
+    .form-label { display:block; margin-block-end:8px; font-size:14px; font-weight:500; color:var(--fg); }
+    .form-input { inline-size:100%; padding:12px 16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.1); border-radius:8px; color:var(--fg); font-size:14px; }
+    .form-input:focus { outline:none; border-color:var(--accent); }
+    .form-textarea { min-block-size:100px; resize:vertical; }
+    
+    footer { margin-block-start:24px; font-size:12px; color:var(--muted); }
+    .credits { margin-block-start:16px; padding-block-start:16px; border-block-start:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; gap:8px; flex-wrap:wrap; }
+    .credits a { color:var(--accent); text-decoration:none; transition:opacity 0.2s; display:inline-flex; align-items:center; gap:6px; }
+    .credits a:hover { opacity:0.8; }
+    .credits img { block-size:20px; inline-size:auto; opacity:0.9; transition:opacity 0.2s; }
+    .credits a:hover img { opacity:1; }
+  </style>
+  <meta name="description" content="xIA — Consultoría especializada en sistemas de programación.">
+</head>
+<body>
+  <div class="wrap">
+    <main class="card" role="main" aria-label="Consultoría xIA">
+      <h1 class="logo">xIA<span class="dot">.</span></h1>
+      <p class="tag">Consultoría especializada en sistemas de programación</p>
+      <div class="hr"></div>
+      <p class="claim">¿Necesitas ayuda con tu proyecto? Consulta con nuestro agente de IA</p>
+      
+      <!-- Chat Interface -->
+      <div class="chat-container" id="chatContainer">
+        <div class="chat-window" id="chatWindow">
+          <div class="message ai">
+            <div class="message-header">xIA Assistant</div>
+            <div class="message-content">¡Hola! Soy tu asistente especializado en sistemas de programación. ¿En qué puedo ayudarte hoy?</div>
+          </div>
+        </div>
+        
+        <div class="input-area">
+          <input type="text" class="input-field" id="messageInput" placeholder="Escribe tu consulta sobre programación..." maxlength="500">
+          <button class="btn" id="sendBtn">Enviar</button>
+        </div>
+        
+        <div class="input-area">
+          <button class="btn secondary" id="emailBtn">Enviar resumen por email</button>
+          <button class="btn secondary" id="clearBtn">Limpiar chat</button>
+        </div>
+      </div>
+      
+      <!-- Email Form -->
+      <div class="email-form" id="emailForm">
+        <h3 style="margin-block-start:0; margin-block-end:20px; color:var(--fg);">Enviar resumen de la consulta</h3>
+        <div class="form-group">
+          <label class="form-label" for="contactName">Nombre de contacto</label>
+          <input type="text" class="form-input" id="contactName" placeholder="Tu nombre completo" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contactEmail">Email de contacto</label>
+          <input type="email" class="form-input" id="contactEmail" placeholder="tu@email.com" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="contactPhone">Teléfono (opcional)</label>
+          <input type="tel" class="form-input" id="contactPhone" placeholder="+54 9 11 1234-5678">
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="summaryText">Resumen de la consulta</label>
+          <textarea class="form-input form-textarea" id="summaryText" placeholder="Describe brevemente tu consulta y lo que necesitas..." required></textarea>
+        </div>
+        <div class="input-area">
+          <button class="btn" id="sendEmailBtn">Enviar consulta</button>
+          <button class="btn secondary" id="cancelEmailBtn">Cancelar</button>
+        </div>
+      </div>
+      
+      <footer>
+        <div>© <span id="y"></span> xIA — Consultoría en Sistemas</div>
+        <div class="credits">
+          Desarrollado por 
+          <a href="https://abmsistemas.com.ar" target="_blank" rel="noopener noreferrer" title="abmSistemas - Desarrollo de Software">
+            <img src="/assets/images/abmsistemas-logo-small.png" alt="abmSistemas" loading="lazy">
+            <span>abmSistemas</span>
+          </a>
+        </div>
+      </footer>
+    </main>
+  </div>
+  
+  <script>
+    // Chat functionality
+    const chatContainer = document.getElementById('chatContainer');
+    const chatWindow = document.getElementById('chatWindow');
+    const messageInput = document.getElementById('messageInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const emailBtn = document.getElementById('emailBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const emailForm = document.getElementById('emailForm');
+    const sendEmailBtn = document.getElementById('sendEmailBtn');
+    const cancelEmailBtn = document.getElementById('cancelEmailBtn');
+    
+    let chatHistory = [];
+    
+    // Detectar URL base de la API (desarrollo vs producción)
+    function getAPIBaseURL() {
+      // Si estamos en localhost (desarrollo), usar localhost:5000
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        return 'http://localhost:5000';
+      }
+      // En producción, usar ruta relativa (Nginx hará proxy)
+      return '';
+    }
+    
+    // Show chat interface
+    function showChat() {
+      chatContainer.classList.add('active');
+      messageInput.focus();
+    }
+    
+    // Add message to chat
+    function addMessage(content, isUser = false) {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
+      
+      const headerDiv = document.createElement('div');
+      headerDiv.className = 'message-header';
+      headerDiv.textContent = isUser ? 'Tú' : 'xIA Assistant';
+      
+      const contentDiv = document.createElement('div');
+      contentDiv.className = 'message-content';
+      contentDiv.textContent = content;
+      
+      messageDiv.appendChild(headerDiv);
+      messageDiv.appendChild(contentDiv);
+      chatWindow.appendChild(messageDiv);
+      
+      // Scroll to bottom
+      chatWindow.scrollTop = chatWindow.scrollHeight;
+      
+      // Store in history
+      chatHistory.push({ content, isUser, timestamp: new Date() });
+    }
+    
+    // Send message
+    async function sendMessage() {
+      const message = messageInput.value.trim();
+      if (!message) return;
+      
+      // Add user message
+      addMessage(message, true);
+      messageInput.value = '';
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Enviando...';
+      
+      try {
+        // Log request
+        console.log('🚀 Enviando consulta:', message);
+        console.log('📋 Historial:', chatHistory.slice(-10));
+        
+        // Call actual API
+        const apiBase = getAPIBaseURL();
+        const response = await fetch(`${apiBase}/api/chat`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            message: message,
+            history: chatHistory.slice(-10) // Send last 10 messages for context
+          })
+        });
+        
+        console.log('📡 Respuesta HTTP:', response.status, response.statusText);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('❌ Error HTTP:', response.status, errorText);
+          throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+        }
+        
+        const data = await response.json();
+        console.log('✅ Respuesta exitosa:', data);
+        addMessage(data.response);
+        
+      } catch (error) {
+        console.error('❌ Error completo:', error);
+        console.error('❌ Stack trace:', error.stack);
+        
+        // Mostrar error más específico al usuario
+        let errorMessage = 'Lo siento, hubo un error procesando tu consulta.';
+        if (error.message.includes('Failed to fetch')) {
+          errorMessage = 'Error de conexión. Verifica que el servidor esté funcionando.';
+        } else if (error.message.includes('HTTP error')) {
+          errorMessage = `Error del servidor: ${error.message}`;
+        }
+        
+        addMessage(errorMessage);
+        
+        // Mostrar detalles en consola para debugging
+        console.log('🔍 Para debugging - Error details:', {
+          message: error.message,
+          stack: error.stack,
+          timestamp: new Date().toISOString(),
+          userMessage: message
+        });
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.textContent = 'Enviar';
+      }
+    }
+    
+    // Clear chat
+    function clearChat() {
+      chatWindow.innerHTML = `
+        <div class="message ai">
+          <div class="message-header">xIA Assistant</div>
+          <div class="message-content">¡Hola! Soy tu asistente especializado en sistemas de programación. ¿En qué puedo ayudarte hoy?</div>
+        </div>
+      `;
+      chatHistory = [];
+    }
+    
+    // Show email form
+    function showEmailForm() {
+      if (chatHistory.length === 0) {
+        alert('No hay consultas para enviar. Primero haz una consulta en el chat.');
+        return;
+      }
+      emailForm.classList.add('active');
+      
+      // Generate summary
+      const summary = chatHistory
+        .filter(msg => msg.isUser)
+        .map(msg => `• ${msg.content}`)
+        .join('\n');
+      document.getElementById('summaryText').value = summary;
+    }
+    
+    // Send email
+    async function sendEmail() {
+      const name = document.getElementById('contactName').value.trim();
+      const email = document.getElementById('contactEmail').value.trim();
+      const phone = document.getElementById('contactPhone').value.trim();
+      const summary = document.getElementById('summaryText').value.trim();
+      
+      if (!name || !email || !summary) {
+        alert('Por favor completa todos los campos obligatorios.');
+        return;
+      }
+      
+      sendEmailBtn.disabled = true;
+      sendEmailBtn.textContent = 'Enviando...';
+      
+      try {
+        // Call actual API
+        const apiBase = getAPIBaseURL();
+        const response = await fetch(`${apiBase}/api/email`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            name: name,
+            email: email,
+            phone: phone,
+            summary: summary,
+            chat_history: chatHistory
+          })
+        });
+        
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+          alert('¡Consulta enviada exitosamente! Te contactaremos pronto.');
+          emailForm.classList.remove('active');
+          
+          // Reset form
+          document.getElementById('contactName').value = '';
+          document.getElementById('contactEmail').value = '';
+          document.getElementById('contactPhone').value = '';
+          document.getElementById('summaryText').value = '';
+        } else {
+          throw new Error(data.message || 'Error al enviar el email');
+        }
+        
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Error al enviar la consulta. Por favor intenta nuevamente.');
+      } finally {
+        sendEmailBtn.disabled = false;
+        sendEmailBtn.textContent = 'Enviar consulta';
+      }
+    }
+    
+    // Event listeners
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendMessage();
+    });
+    emailBtn.addEventListener('click', showEmailForm);
+    clearBtn.addEventListener('click', clearChat);
+    sendEmailBtn.addEventListener('click', sendEmail);
+    cancelEmailBtn.addEventListener('click', () => {
+      emailForm.classList.remove('active');
+    });
+    
+    // Check API connection
+    async function checkAPI() {
+      try {
+        const apiBase = getAPIBaseURL();
+        const response = await fetch(`${apiBase}/api/health`);
+        if (response.ok) {
+          console.log('✅ API conectada correctamente');
+        } else {
+          console.warn('⚠️ API no disponible');
+        }
+      } catch (error) {
+        console.error('❌ Error conectando con la API:', error);
+      }
+    }
+    
+    // Show chat on page load
+    setTimeout(() => {
+      checkAPI();
+      showChat();
+    }, 500);
+    
+    // Set current year
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
