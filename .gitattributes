@@ -1,0 +1,52 @@
+# ============================================
+# xIA Backend - .gitattributes
+# Control de finales de línea y atributos de archivos
+# ============================================
+
+# Normalizar todos los archivos de texto a LF en el repositorio
+* text=auto eol=lf
+
+# Scripts shell siempre con LF (importante para Linux)
+*.sh text eol=lf
+*.bash text eol=lf
+
+# Scripts de Python siempre con LF
+*.py text eol=lf
+
+# Archivos de configuración
+*.conf text eol=lf
+*.ini text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+
+# Archivos de documentación
+*.md text eol=lf
+*.rst text eol=lf
+
+# Archivos de configuración de Git
+.gitignore text eol=lf
+.gitattributes text eol=lf
+
+# Archivos binarios (no modificar)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.tar binary
+*.gz binary
+*.pyc binary
+*.pyo binary
+*.so binary
+*.dll binary
+*.exe binary
+
+# Archivos de entorno virtual (ya ignorados, pero por si acaso)
+venv/** -text
+.venv/** -text
+
