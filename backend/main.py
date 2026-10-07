@@ -26,6 +26,8 @@ from services.auth import (
 )
 from services.conversa import ConversaClient
 from services.llm import LLMService
+from services.recaptcha import RecaptchaError, verify_recaptcha_token
+from services.safety import SAFE_REJECTION_REPLY, detect_prompt_injection
 from services.store import Store
 
 load_environment_config()
@@ -94,6 +96,7 @@ def health_check():
                 "google_configured": bool(settings.google_client_id),
                 "llm_configured": llm.is_configured,
                 "conversa_configured": conversa.is_configured,
+                "recaptcha_configured": bool(settings.recaptcha_site_key and settings.recaptcha_secret_key),
                 "daily_message_limit": settings.daily_message_limit,
             },
         }
@@ -107,6 +110,8 @@ def auth_config():
             "google_client_id": settings.google_client_id or None,
             "auth_required": settings.auth_required,
             "daily_message_limit": settings.daily_message_limit,
+            "recaptcha_site_key": settings.recaptcha_site_key or None,
+            "recaptcha_required": bool(settings.recaptcha_secret_key),
         }
     )
 
@@ -115,8 +120,14 @@ def auth_config():
 def auth_google():
     data = request.get_json(silent=True) or {}
     id_token = (data.get("id_token") or data.get("credential") or "").strip()
+    captcha_token = (data.get("captcha_token") or data.get("g-recaptcha-response") or "").strip()
     if not id_token:
         return jsonify({"error": "id_token requerido"}), 400
+
+    try:
+        verify_recaptcha_token(captcha_token, settings, remote_ip=request.remote_addr)
+    except RecaptchaError as exc:
+        return jsonify({"error": exc.message}), exc.status_code
 
     try:
         profile = verify_google_id_token(id_token, settings.google_client_id)
@@ -181,8 +192,32 @@ def chat():
 
     if not message:
         return jsonify({"error": "Mensaje no puede estar vacío"}), 400
-    if len(message) > 2000:
-        return jsonify({"error": "Mensaje demasiado largo (máx. 2000)"}), 400
+    if len(message) > settings.max_message_length:
+        return jsonify(
+            {"error": f"Mensaje demasiado largo (máx. {settings.max_message_length})"}
+        ), 400
+
+    injection = detect_prompt_injection(message)
+    if injection:
+        logger.warning(
+            "Posible prompt injection user=%s reason=%s",
+            user.get("email"),
+            injection,
+        )
+        used = store.get_daily_usage(user["id"])
+        # No gasta cuota ni llama al LLM; responde con rechazo seguro
+        return jsonify(
+            {
+                "response": SAFE_REJECTION_REPLY,
+                "mode": "blocked",
+                "timestamp": datetime.now().isoformat(),
+                "quota": {
+                    "used": used,
+                    "limit": settings.daily_message_limit,
+                    "remaining": max(0, settings.daily_message_limit - used),
+                },
+            }
+        )
 
     used = store.get_daily_usage(user["id"])
     if used >= settings.daily_message_limit:

@@ -47,6 +47,10 @@ class Settings:
     conversa_api_key: str
     database_path: str
     auth_required: bool
+    recaptcha_site_key: str
+    recaptcha_secret_key: str
+    recaptcha_min_score: float
+    max_message_length: int
 
 
 def get_settings() -> Settings:
@@ -65,4 +69,8 @@ def get_settings() -> Settings:
         conversa_api_key=os.environ.get("CONVERSA_API_KEY", "").strip(),
         database_path=os.environ.get("DATABASE_PATH", default_db),
         auth_required=os.environ.get("AUTH_REQUIRED", "true").lower() in ("1", "true", "yes"),
+        recaptcha_site_key=os.environ.get("RECAPTCHA_SITE_KEY", "").strip(),
+        recaptcha_secret_key=os.environ.get("RECAPTCHA_SECRET_KEY", "").strip(),
+        recaptcha_min_score=float(os.environ.get("RECAPTCHA_MIN_SCORE", "0.5")),
+        max_message_length=int(os.environ.get("MAX_MESSAGE_LENGTH", "1000")),
     )
