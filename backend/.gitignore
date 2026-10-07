@@ -25,6 +25,7 @@ config/secrets.py
 *.db
 *.sqlite
 *.sqlite3
+data/
 
 # ============================================
 # ENTORNO VIRTUAL (muy pesado, se regenera)
